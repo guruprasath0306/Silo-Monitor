@@ -14,7 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      silos: {
+        Row: {
+          capacity: number
+          co2_level: number | null
+          created_at: string
+          grain_amount: number
+          grain_type: string
+          humidity: number
+          id: string
+          last_updated: string
+          latitude: number
+          longitude: number
+          name: string
+          pest_activity: Database["public"]["Enums"]["pest_activity"]
+          status: Database["public"]["Enums"]["silo_status"]
+          temperature: number
+        }
+        Insert: {
+          capacity?: number
+          co2_level?: number | null
+          created_at?: string
+          grain_amount?: number
+          grain_type: string
+          humidity?: number
+          id?: string
+          last_updated?: string
+          latitude: number
+          longitude: number
+          name: string
+          pest_activity?: Database["public"]["Enums"]["pest_activity"]
+          status?: Database["public"]["Enums"]["silo_status"]
+          temperature?: number
+        }
+        Update: {
+          capacity?: number
+          co2_level?: number | null
+          created_at?: string
+          grain_amount?: number
+          grain_type?: string
+          humidity?: number
+          id?: string
+          last_updated?: string
+          latitude?: number
+          longitude?: number
+          name?: string
+          pest_activity?: Database["public"]["Enums"]["pest_activity"]
+          status?: Database["public"]["Enums"]["silo_status"]
+          temperature?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +73,8 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      pest_activity: "none" | "low" | "moderate" | "high"
+      silo_status: "normal" | "warning" | "critical"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +201,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      pest_activity: ["none", "low", "moderate", "high"],
+      silo_status: ["normal", "warning", "critical"],
+    },
   },
 } as const
