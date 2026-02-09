@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import { GoogleMap, useJsApiLoader, OverlayViewF, OverlayView } from '@react-google-maps/api';
-import { SILOS, TAMIL_NADU_CENTER, Silo, getStatusColor } from '@/data/silos';
+import { TAMIL_NADU_CENTER, Silo, getStatusColor } from '@/data/silos';
+import { useSilos } from '@/hooks/useSilos';
 import SiloInfoPanel from '@/components/SiloInfoPanel';
 import SiloList from '@/components/SiloList';
 
@@ -57,6 +58,7 @@ const SiloMarker = ({ silo, isSelected, onClick }: { silo: Silo; isSelected: boo
 const Index = () => {
   const [selectedSilo, setSelectedSilo] = useState<Silo | null>(null);
   const [map, setMap] = useState<google.maps.Map | null>(null);
+  const { silos, loading: silosLoading, error: silosError } = useSilos();
 
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: 'AIzaSyAbjdHGqv709iK21S2Zj3u3MUJu9xBnfIQ',
@@ -72,12 +74,14 @@ const Index = () => {
     map?.setZoom(12);
   };
 
-  if (!isLoaded) {
+  if (!isLoaded || silosLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-3">
           <div className="w-10 h-10 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-          <p className="text-muted-foreground text-sm">Loading Silo Network Map...</p>
+          <p className="text-muted-foreground text-sm">
+            {silosLoading ? 'Loading Silo Data...' : 'Loading Silo Network Map...'}
+          </p>
         </div>
       </div>
     );
@@ -88,7 +92,7 @@ const Index = () => {
       {/* Sidebar */}
       <div className="w-[300px] flex-shrink-0">
         <SiloList
-          silos={SILOS}
+          silos={silos}
           selectedId={selectedSilo?.id ?? null}
           onSelect={handleSiloSelect}
         />
@@ -110,7 +114,7 @@ const Index = () => {
             fullscreenControl: false,
           }}
         >
-          {SILOS.map((silo) => (
+          {silos.map((silo) => (
             <OverlayViewF
               key={silo.id}
               position={{ lat: silo.lat, lng: silo.lng }}
@@ -133,9 +137,9 @@ const Index = () => {
         {/* Top Stats Bar */}
         <div className="absolute top-4 left-4 z-10 flex gap-2">
           {[
-            { label: 'Total Silos', value: SILOS.length, color: 'primary' },
-            { label: 'Alerts', value: SILOS.filter((s) => s.status !== 'normal').length, color: 'warning' },
-            { label: 'Critical', value: SILOS.filter((s) => s.status === 'critical').length, color: 'destructive' },
+            { label: 'Total Silos', value: silos.length, color: 'primary' },
+            { label: 'Alerts', value: silos.filter((s) => s.status !== 'normal').length, color: 'warning' },
+            { label: 'Critical', value: silos.filter((s) => s.status === 'critical').length, color: 'destructive' },
           ].map((stat) => (
             <div
               key={stat.label}
