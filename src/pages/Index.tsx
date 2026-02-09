@@ -1,11 +1,151 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useCallback, useState } from 'react';
+import { GoogleMap, useJsApiLoader, OverlayViewF, OverlayView } from '@react-google-maps/api';
+import { SILOS, TAMIL_NADU_CENTER, Silo, getStatusColor } from '@/data/silos';
+import SiloInfoPanel from '@/components/SiloInfoPanel';
+import SiloList from '@/components/SiloList';
+
+const MAP_STYLES: google.maps.MapTypeStyle[] = [
+  { elementType: 'geometry', stylers: [{ color: '#1a1d23' }] },
+  { elementType: 'labels.text.stroke', stylers: [{ color: '#1a1d23' }] },
+  { elementType: 'labels.text.fill', stylers: [{ color: '#5a6270' }] },
+  { featureType: 'administrative', elementType: 'geometry.stroke', stylers: [{ color: '#2d3240' }] },
+  { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#252830' }] },
+  { featureType: 'road', elementType: 'geometry.stroke', stylers: [{ color: '#1a1d23' }] },
+  { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#0e1117' }] },
+  { featureType: 'poi', stylers: [{ visibility: 'off' }] },
+  { featureType: 'transit', stylers: [{ visibility: 'off' }] },
+];
+
+const containerStyle = { width: '100%', height: '100%' };
+
+const SiloMarker = ({ silo, isSelected, onClick }: { silo: Silo; isSelected: boolean; onClick: () => void }) => {
+  const color = getStatusColor(silo.status);
+  const size = isSelected ? 48 : 38;
+
+  return (
+    <button
+      onClick={onClick}
+      className="flex flex-col items-center transition-transform duration-200 hover:scale-110"
+      style={{ transform: isSelected ? 'scale(1.15)' : undefined }}
+      title={silo.name}
+    >
+      <svg width={size} height={size} viewBox="0 0 48 48" fill="none">
+        {/* Silo body */}
+        <rect x="14" y="16" width="20" height="24" rx="2" fill={color} fillOpacity="0.85" stroke={color} strokeWidth="1.5" />
+        {/* Silo dome */}
+        <ellipse cx="24" cy="16" rx="10" ry="6" fill={color} fillOpacity="0.65" stroke={color} strokeWidth="1.5" />
+        {/* Grain lines */}
+        <line x1="18" y1="28" x2="30" y2="28" stroke={`${color}`} strokeOpacity="0.4" strokeWidth="1" />
+        <line x1="18" y1="32" x2="30" y2="32" stroke={`${color}`} strokeOpacity="0.4" strokeWidth="1" />
+        <line x1="18" y1="36" x2="30" y2="36" stroke={`${color}`} strokeOpacity="0.4" strokeWidth="1" />
+        {/* Base */}
+        <rect x="12" y="39" width="24" height="3" rx="1" fill={color} fillOpacity="0.5" />
+        {silo.status === 'critical' && (
+          <circle cx="38" cy="10" r="6" fill="hsl(0, 72%, 55%)" className="animate-sensor-blink" />
+        )}
+      </svg>
+      <span
+        className="text-[10px] font-bold px-1.5 py-0.5 rounded mt-0.5 whitespace-nowrap"
+        style={{ backgroundColor: `${color}30`, color }}
+      >
+        {silo.sensors.temperature}°C | {silo.sensors.humidity}%
+      </span>
+    </button>
+  );
+};
 
 const Index = () => {
+  const [selectedSilo, setSelectedSilo] = useState<Silo | null>(null);
+  const [map, setMap] = useState<google.maps.Map | null>(null);
+
+  const { isLoaded } = useJsApiLoader({
+    googleMapsApiKey: 'AIzaSyAbjdHGqv709iK21S2Zj3u3MUJu9xBnfIQ',
+  });
+
+  const onLoad = useCallback((map: google.maps.Map) => {
+    setMap(map);
+  }, []);
+
+  const handleSiloSelect = (silo: Silo) => {
+    setSelectedSilo(silo);
+    map?.panTo({ lat: silo.lat, lng: silo.lng });
+    map?.setZoom(12);
+  };
+
+  if (!isLoaded) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+          <p className="text-muted-foreground text-sm">Loading Silo Network Map...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
+    <div className="flex h-screen bg-background overflow-hidden">
+      {/* Sidebar */}
+      <div className="w-[300px] flex-shrink-0">
+        <SiloList
+          silos={SILOS}
+          selectedId={selectedSilo?.id ?? null}
+          onSelect={handleSiloSelect}
+        />
+      </div>
+
+      {/* Map Area */}
+      <div className="flex-1 relative">
+        <GoogleMap
+          mapContainerStyle={containerStyle}
+          center={TAMIL_NADU_CENTER}
+          zoom={7}
+          onLoad={onLoad}
+          options={{
+            styles: MAP_STYLES,
+            disableDefaultUI: true,
+            zoomControl: true,
+            mapTypeControl: false,
+            streetViewControl: false,
+            fullscreenControl: false,
+          }}
+        >
+          {SILOS.map((silo) => (
+            <OverlayViewF
+              key={silo.id}
+              position={{ lat: silo.lat, lng: silo.lng }}
+              mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+            >
+              <SiloMarker
+                silo={silo}
+                isSelected={selectedSilo?.id === silo.id}
+                onClick={() => handleSiloSelect(silo)}
+              />
+            </OverlayViewF>
+          ))}
+        </GoogleMap>
+
+        {/* Info Panel */}
+        {selectedSilo && (
+          <SiloInfoPanel silo={selectedSilo} onClose={() => setSelectedSilo(null)} />
+        )}
+
+        {/* Top Stats Bar */}
+        <div className="absolute top-4 left-4 z-10 flex gap-2">
+          {[
+            { label: 'Total Silos', value: SILOS.length, color: 'primary' },
+            { label: 'Alerts', value: SILOS.filter((s) => s.status !== 'normal').length, color: 'warning' },
+            { label: 'Critical', value: SILOS.filter((s) => s.status === 'critical').length, color: 'destructive' },
+          ].map((stat) => (
+            <div
+              key={stat.label}
+              className="bg-card/90 backdrop-blur-sm border border-border rounded-lg px-3 py-2 min-w-[100px]"
+            >
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{stat.label}</p>
+              <p className="text-xl font-bold font-mono text-foreground">{stat.value}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
