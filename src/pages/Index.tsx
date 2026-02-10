@@ -4,6 +4,8 @@ import { TAMIL_NADU_CENTER, Silo, getStatusColor } from '@/data/silos';
 import { useSilos } from '@/hooks/useSilos';
 import SiloInfoPanel from '@/components/SiloInfoPanel';
 import SiloList from '@/components/SiloList';
+import ManageSilos from '@/components/ManageSilos';
+import { Settings, Plus } from 'lucide-react';
 
 const MAP_STYLES: google.maps.MapTypeStyle[] = [
   { elementType: 'geometry', stylers: [{ color: '#1a1d23' }] },
@@ -58,6 +60,7 @@ const SiloMarker = ({ silo, isSelected, onClick }: { silo: Silo; isSelected: boo
 const Index = () => {
   const [selectedSilo, setSelectedSilo] = useState<Silo | null>(null);
   const [map, setMap] = useState<google.maps.Map | null>(null);
+  const [showManageSilos, setShowManageSilos] = useState(false);
   const { silos, loading: silosLoading, error: silosError } = useSilos();
 
   const { isLoaded } = useJsApiLoader({
@@ -88,7 +91,7 @@ const Index = () => {
   }
 
   return (
-    <div className="flex h-screen bg-background overflow-hidden">
+    <div className="flex h-screen bg-background overflow-hidden relative">
       {/* Sidebar */}
       <div className="w-[300px] flex-shrink-0">
         <SiloList
@@ -150,7 +153,25 @@ const Index = () => {
             </div>
           ))}
         </div>
+
+        {/* Manage Silos Button */}
+        <div className="absolute top-4 right-4 z-10 flex gap-2">
+          <button
+            onClick={() => setShowManageSilos(!showManageSilos)}
+            className="bg-card border border-border text-foreground px-4 py-2 rounded-lg font-semibold shadow-lg hover:bg-muted transition-colors flex items-center gap-2"
+          >
+            {showManageSilos ? <Plus className="rotate-45 transition-transform" /> : <Settings size={18} />}
+            Manage Silos
+          </button>
+        </div>
       </div>
+
+      {/* Manage Silos Panel */}
+      <ManageSilos
+        silos={silos}
+        isOpen={showManageSilos}
+        onClose={() => setShowManageSilos(false)}
+      />
     </div>
   );
 };
