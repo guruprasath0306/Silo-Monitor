@@ -5,7 +5,8 @@ import { useSilos } from '@/hooks/useSilos';
 import SiloInfoPanel from '@/components/SiloInfoPanel';
 import SiloList from '@/components/SiloList';
 import ManageSilos from '@/components/ManageSilos';
-import { Settings, Plus } from 'lucide-react';
+import { Settings, Plus, Menu } from 'lucide-react';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 const MAP_STYLES: google.maps.MapTypeStyle[] = [
   { elementType: 'geometry', stylers: [{ color: '#1a1d23' }] },
@@ -92,8 +93,8 @@ const Index = () => {
 
   return (
     <div className="flex h-screen bg-background overflow-hidden relative">
-      {/* Sidebar */}
-      <div className="w-[300px] flex-shrink-0">
+      {/* Desktop Sidebar */}
+      <div className="hidden md:block w-[300px] flex-shrink-0">
         <SiloList
           silos={silos}
           selectedId={selectedSilo?.id ?? null}
@@ -132,13 +133,34 @@ const Index = () => {
           ))}
         </GoogleMap>
 
+        {/* Mobile Menu Button */}
+        <div className="absolute top-4 left-4 z-10 md:hidden">
+          <Sheet>
+            <SheetTrigger asChild>
+              <button className="bg-card border border-border p-2 rounded-lg shadow-lg">
+                <Menu size={24} />
+              </button>
+            </SheetTrigger>
+            <SheetContent side="left" className="p-0 w-[300px]">
+              <SiloList
+                silos={silos}
+                selectedId={selectedSilo?.id ?? null}
+                onSelect={(silo) => {
+                  handleSiloSelect(silo);
+                  // Optional: Close sheet here if we had access to open state
+                }}
+              />
+            </SheetContent>
+          </Sheet>
+        </div>
+
         {/* Info Panel */}
         {selectedSilo && (
           <SiloInfoPanel silo={selectedSilo} onClose={() => setSelectedSilo(null)} />
         )}
 
-        {/* Top Stats Bar */}
-        <div className="absolute top-4 left-4 z-10 flex gap-2">
+        {/* Top Stats Bar - Hidden on mobile, shown on desktop */}
+        <div className="absolute top-4 left-16 md:left-4 z-10 flex gap-2 overflow-x-auto max-w-[calc(100%-120px)] md:max-w-none pb-2 md:pb-0 hide-scrollbar">
           {[
             { label: 'Total Silos', value: silos.length, color: 'primary' },
             { label: 'Alerts', value: silos.filter((s) => s.status !== 'normal').length, color: 'warning' },
@@ -146,7 +168,7 @@ const Index = () => {
           ].map((stat) => (
             <div
               key={stat.label}
-              className="bg-card/90 backdrop-blur-sm border border-border rounded-lg px-3 py-2 min-w-[100px]"
+              className="bg-card/90 backdrop-blur-sm border border-border rounded-lg px-3 py-2 min-w-[100px] flex-shrink-0"
             >
               <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{stat.label}</p>
               <p className="text-xl font-bold font-mono text-foreground">{stat.value}</p>
@@ -158,10 +180,10 @@ const Index = () => {
         <div className="absolute top-4 right-4 z-10 flex gap-2">
           <button
             onClick={() => setShowManageSilos(!showManageSilos)}
-            className="bg-card border border-border text-foreground px-4 py-2 rounded-lg font-semibold shadow-lg hover:bg-muted transition-colors flex items-center gap-2"
+            className="bg-card border border-border text-foreground px-3 py-2 md:px-4 md:py-2 rounded-lg font-semibold shadow-lg hover:bg-muted transition-colors flex items-center gap-2"
           >
             {showManageSilos ? <Plus className="rotate-45 transition-transform" /> : <Settings size={18} />}
-            Manage Silos
+            <span className="hidden md:inline">Manage Silos</span>
           </button>
         </div>
       </div>

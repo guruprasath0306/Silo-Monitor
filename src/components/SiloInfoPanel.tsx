@@ -8,9 +8,9 @@ interface SiloInfoPanelProps {
 
 const SiloInfoPanel = ({ silo, onClose }: SiloInfoPanelProps) => {
   const fillPercent = Math.round((silo.grainAmount / silo.capacity) * 100);
-  
+
   return (
-    <div className="absolute top-4 right-4 z-10 w-[380px] bg-card border border-border rounded-lg shadow-2xl overflow-hidden">
+    <div className="absolute top-auto bottom-0 right-0 left-0 md:top-4 md:bottom-auto md:left-auto md:right-4 z-10 w-full md:w-[380px] bg-card border-t md:border border-border rounded-t-xl md:rounded-lg shadow-2xl overflow-hidden max-h-[60vh] md:max-h-none overflow-y-auto">
       {/* Header */}
       <div
         className="p-4 flex items-center justify-between"

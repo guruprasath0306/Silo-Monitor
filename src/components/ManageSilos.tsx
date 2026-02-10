@@ -86,7 +86,7 @@ const ManageSilos = ({ silos, isOpen, onClose }: ManageSilosProps) => {
     if (!isOpen) return null;
 
     return (
-        <div className="absolute top-0 right-0 h-full w-[400px] bg-background border-l border-border shadow-2xl z-20 flex flex-col animate-in slide-in-from-right duration-300">
+        <div className="absolute top-0 right-0 h-full w-full md:w-[400px] bg-background border-l border-border shadow-2xl z-20 flex flex-col animate-in slide-in-from-right duration-300">
             <div className="p-6 border-b border-border flex items-center justify-between bg-card">
                 <div>
                     <h2 className="text-2xl font-bold text-foreground">Manage Silos</h2>
@@ -166,8 +166,8 @@ const ManageSilos = ({ silos, isOpen, onClose }: ManageSilosProps) => {
                                         type="button"
                                         onClick={() => handleGrainTypeSelect(type)}
                                         className={`px-3 py-1.5 rounded-lg text-sm transition-colors border ${formData.grainType === type
-                                                ? 'bg-primary/10 border-primary text-primary font-medium'
-                                                : 'bg-muted border-transparent text-muted-foreground hover:bg-muted/80'
+                                            ? 'bg-primary/10 border-primary text-primary font-medium'
+                                            : 'bg-muted border-transparent text-muted-foreground hover:bg-muted/80'
                                             }`}
                                     >
                                         {type}
