@@ -836,3 +836,29 @@
   background: hsl(var(--muted));
   border-color: hsl(var(--primary) / 0.4);
 }
+
+/* ─── Responsive / Safe-area utilities ──────────────────────── */
+
+/* Safe-area insets for iOS notch / Android cutout */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .pb-safe {
+    padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+  }
+}
+
+/* Make tap targets at least 44px on touch devices */
+@media (pointer: coarse) {
+
+  button,
+  a,
+  [role="button"] {
+    min-height: 44px;
+  }
+}
+
+/* Tablet-specific: slightly narrower stat cards */
+@media (min-width: 640px) and (max-width: 1023px) {
+  .login-card-inner {
+    padding: 2rem 1.75rem;
+  }
+}

@@ -88,7 +88,7 @@ const ManageSilos = ({ silos, isOpen, onClose }: ManageSilosProps) => {
     if (!isOpen) return null;
 
     return (
-        <div className="absolute top-0 right-0 h-full w-full md:w-[400px] bg-background border-l border-border shadow-2xl z-20 flex flex-col animate-in slide-in-from-right duration-300">
+        <div className="absolute top-0 right-0 h-full w-full sm:w-[420px] md:w-[440px] bg-background border-l border-border shadow-2xl z-20 flex flex-col animate-in slide-in-from-right duration-300">
             <div className="p-6 border-b border-border flex items-center justify-between bg-card">
                 <div>
                     <h2 className="text-2xl font-bold text-foreground">Manage Silos</h2>
@@ -102,7 +102,7 @@ const ManageSilos = ({ silos, isOpen, onClose }: ManageSilosProps) => {
                 </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-6 space-y-8">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 pb-safe">
 
                 {/* Role Notice for restricted roles */}
                 {!canManage && (
@@ -127,7 +127,7 @@ const ManageSilos = ({ silos, isOpen, onClose }: ManageSilosProps) => {
                                     value={formData.name}
                                     onChange={handleInputChange}
                                     placeholder="e.g. Chennai Silo G7"
-                                    className="w-full px-3 py-2 bg-muted rounded-lg border border-input text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                    className="w-full min-h-[44px] px-3 py-2.5 bg-muted rounded-lg border border-input text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                                 />
                             </div>
 
@@ -138,7 +138,7 @@ const ManageSilos = ({ silos, isOpen, onClose }: ManageSilosProps) => {
                                     value={formData.location}
                                     onChange={handleInputChange}
                                     placeholder="e.g. Chennai, Tamil Nadu"
-                                    className="w-full px-3 py-2 bg-muted rounded-lg border border-input text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                    className="w-full min-h-[44px] px-3 py-2.5 bg-muted rounded-lg border border-input text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                                 />
                             </div>
 
@@ -153,7 +153,7 @@ const ManageSilos = ({ silos, isOpen, onClose }: ManageSilosProps) => {
                                         value={formData.lat}
                                         onChange={handleInputChange}
                                         placeholder="e.g. 13.0827"
-                                        className="w-full px-3 py-2 bg-muted rounded-lg border border-input text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                        className="w-full min-h-[44px] px-3 py-2.5 bg-muted rounded-lg border border-input text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                                     />
                                 </div>
                                 <div className="space-y-1">
@@ -166,7 +166,7 @@ const ManageSilos = ({ silos, isOpen, onClose }: ManageSilosProps) => {
                                         value={formData.lng}
                                         onChange={handleInputChange}
                                         placeholder="e.g. 80.2707"
-                                        className="w-full px-3 py-2 bg-muted rounded-lg border border-input text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                        className="w-full min-h-[44px] px-3 py-2.5 bg-muted rounded-lg border border-input text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                                     />
                                 </div>
                             </div>
@@ -200,7 +200,7 @@ const ManageSilos = ({ silos, isOpen, onClose }: ManageSilosProps) => {
                                         value={formData.amount}
                                         onChange={handleInputChange}
                                         placeholder="e.g. 200"
-                                        className="w-full px-3 py-2 bg-muted rounded-lg border border-input text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                        className="w-full min-h-[44px] px-3 py-2.5 bg-muted rounded-lg border border-input text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                                     />
                                 </div>
                                 <div className="space-y-1">
@@ -212,7 +212,7 @@ const ManageSilos = ({ silos, isOpen, onClose }: ManageSilosProps) => {
                                         value={formData.capacity}
                                         onChange={handleInputChange}
                                         placeholder="e.g. 500"
-                                        className="w-full px-3 py-2 bg-muted rounded-lg border border-input text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                        className="w-full min-h-[44px] px-3 py-2.5 bg-muted rounded-lg border border-input text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                                     />
                                 </div>
                             </div>

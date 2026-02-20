@@ -105,7 +105,7 @@ const Index = () => {
   return (
     <div className="flex h-screen bg-background overflow-hidden relative">
       {/* Desktop Sidebar */}
-      <div className="hidden md:block w-[300px] flex-shrink-0">
+      <div className="hidden lg:block w-[280px] xl:w-[300px] flex-shrink-0">
         <SiloList
           silos={silos}
           selectedId={selectedSilo?.id ?? null}
@@ -144,21 +144,20 @@ const Index = () => {
           ))}
         </GoogleMap>
 
-        {/* Mobile Menu Button */}
-        <div className="absolute top-4 left-4 z-10 md:hidden">
+        {/* Mobile & Tablet Menu Button */}
+        <div className="absolute top-3 left-3 z-10 lg:hidden">
           <Sheet>
             <SheetTrigger asChild>
-              <button className="bg-card border border-border p-2 rounded-lg shadow-lg">
-                <Menu size={24} />
+              <button className="bg-card/90 backdrop-blur-sm border border-border p-2.5 rounded-xl shadow-lg hover:bg-muted transition-colors">
+                <Menu size={20} />
               </button>
             </SheetTrigger>
-            <SheetContent side="left" className="p-0 w-[300px]">
+            <SheetContent side="left" className="p-0 w-[280px] sm:w-[300px]">
               <SiloList
                 silos={silos}
                 selectedId={selectedSilo?.id ?? null}
                 onSelect={(silo) => {
                   handleSiloSelect(silo);
-                  // Optional: Close sheet here if we had access to open state
                 }}
               />
             </SheetContent>
@@ -170,8 +169,9 @@ const Index = () => {
           <SiloInfoPanel silo={selectedSilo} onClose={() => setSelectedSilo(null)} />
         )}
 
-        {/* Top Stats Bar - Hidden on mobile, shown on desktop */}
-        <div className="absolute top-4 left-16 md:left-4 z-10 flex gap-2 overflow-x-auto max-w-[calc(100%-120px)] md:max-w-none pb-2 md:pb-0 hide-scrollbar">
+        {/* Top Stats Bar */}
+        <div className="absolute top-3 z-10 flex gap-2 overflow-x-auto pb-1 hide-scrollbar"
+          style={{ left: '3.25rem', right: selectedSilo ? '0.75rem' : '0.75rem', maxWidth: 'calc(100% - 4rem)' }}>
           {[
             { label: 'Total Silos', value: silos.length, color: 'primary' },
             { label: 'Alerts', value: silos.filter((s) => s.status !== 'normal').length, color: 'warning' },
@@ -179,22 +179,22 @@ const Index = () => {
           ].map((stat) => (
             <div
               key={stat.label}
-              className="bg-card/90 backdrop-blur-sm border border-border rounded-lg px-3 py-2 min-w-[100px] flex-shrink-0"
+              className="bg-card/90 backdrop-blur-sm border border-border rounded-lg px-2.5 py-1.5 min-w-[80px] sm:min-w-[100px] flex-shrink-0"
             >
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{stat.label}</p>
-              <p className="text-xl font-bold font-mono text-foreground">{stat.value}</p>
+              <p className="text-[9px] sm:text-[10px] text-muted-foreground uppercase tracking-wider">{stat.label}</p>
+              <p className="text-lg sm:text-xl font-bold font-mono text-foreground">{stat.value}</p>
             </div>
           ))}
         </div>
 
         {/* Manage Silos Button */}
-        <div className="absolute bottom-4 right-4 z-10 flex gap-2">
+        <div className="absolute bottom-4 right-4 z-10">
           <button
             onClick={() => setShowManageSilos(!showManageSilos)}
-            className="bg-card border border-border text-foreground px-3 py-2 md:px-4 md:py-2 rounded-lg font-semibold shadow-lg hover:bg-muted transition-colors flex items-center gap-2"
+            className="bg-card/90 backdrop-blur-sm border border-border text-foreground px-3 py-2.5 md:px-4 md:py-2.5 rounded-xl font-semibold shadow-lg hover:bg-muted transition-colors flex items-center gap-2"
           >
             {showManageSilos ? <Plus className="rotate-45 transition-transform" /> : <Settings size={18} />}
-            <span className="hidden md:inline">Manage Silos</span>
+            <span className="hidden sm:inline text-sm">Manage Silos</span>
           </button>
         </div>
       </div>
