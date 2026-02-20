@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Wheat, ChevronDown, Lock, Mail, AlertCircle } from 'lucide-react';
-import { getCredentials } from '@/lib/credentials';
 
 const ROLES = [
     { value: 'admin', label: 'Administrator', description: 'Full system access' },
@@ -35,23 +34,10 @@ export default function Login() {
         }
 
         setLoading(true);
-        // Simulate short auth delay
+        // Simulate auth — accepts any non-empty credentials
         await new Promise((res) => setTimeout(res, 800));
-
-        // Read stored (or default) credentials for the selected role
-        const stored = getCredentials(role);
-        const emailMatch = emailOrUsername === stored.email || emailOrUsername === role;
-        const passMatch = password === stored.password;
-
-        if (emailMatch && passMatch) {
-            sessionStorage.setItem('auth', JSON.stringify({ email: emailOrUsername, role }));
-            navigate('/');
-        } else {
-            setError(
-                `Invalid credentials for ${ROLES.find(r => r.value === role)?.label}. ` +
-                `Check your email/password or reset them from the dashboard.`
-            );
-        }
+        sessionStorage.setItem('auth', JSON.stringify({ email: emailOrUsername, role }));
+        navigate('/');
         setLoading(false);
     };
 
@@ -267,23 +253,7 @@ export default function Login() {
                         </button>
                     </div>
 
-                    {/* Hint for first-time users */}
-                    {role && (
-                        <div className="demo-credentials">
-                            <p className="text-xs text-muted-foreground mb-1 font-medium uppercase tracking-wide">
-                                Default credentials for {selectedRole?.label}
-                            </p>
-                            <p className="text-xs font-mono text-foreground/80">
-                                📧 {role}@farmsense.io
-                            </p>
-                            <p className="text-xs font-mono text-foreground/80">
-                                🔑 {role}123
-                            </p>
-                            <p className="text-xs text-muted-foreground/60 mt-1">
-                                You can change these from the dashboard → Profile Settings
-                            </p>
-                        </div>
-                    )}
+
                 </div>
             </div>
         </div>
