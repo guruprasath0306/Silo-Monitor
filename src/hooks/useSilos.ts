@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Silo, SiloSensor } from '@/data/silos';
+import { Silo, SiloSensor, SILOS } from '@/data/silos';
 
 export function useSilos() {
   const [silos, setSilos] = useState<Silo[]>([]);
@@ -38,7 +38,7 @@ export function useSilos() {
         return;
       }
 
-      setSilos((data ?? []).map(mapRow));
+      setSilos((data && data.length > 0) ? data.map(mapRow) : SILOS);
       setLoading(false);
     };
 

@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Silo, getStatusColor } from '@/data/silos';
-import { X, Plus, Trash2, Wheat, MapPin } from 'lucide-react';
+import { X, Plus, Trash2, Wheat, MapPin, ShieldAlert } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useAuth } from '@/hooks/useAuth';
 
 interface ManageSilosProps {
     silos: Silo[];
@@ -13,6 +14,7 @@ interface ManageSilosProps {
 const GRAIN_TYPES = ['Rice', 'Wheat', 'Maize', 'Millet'];
 
 const ManageSilos = ({ silos, isOpen, onClose }: ManageSilosProps) => {
+    const { user, canManage, canDelete } = useAuth();
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
@@ -101,124 +103,137 @@ const ManageSilos = ({ silos, isOpen, onClose }: ManageSilosProps) => {
             </div>
 
             <div className="flex-1 overflow-y-auto p-6 space-y-8">
-                {/* Add New Silo Form */}
-                <div className="bg-card rounded-xl border border-border p-4 shadow-sm">
-                    <h3 className="font-semibold text-lg mb-4">Add New Silo</h3>
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        <div className="space-y-1">
-                            <label className="text-xs font-medium text-muted-foreground">Silo Name *</label>
-                            <input
-                                required
-                                name="name"
-                                value={formData.name}
-                                onChange={handleInputChange}
-                                placeholder="e.g. Chennai Silo G7"
-                                className="w-full px-3 py-2 bg-muted rounded-lg border border-input text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-                            />
-                        </div>
 
-                        <div className="space-y-1">
-                            <label className="text-xs font-medium text-muted-foreground">Location Name</label>
-                            <input
-                                name="location"
-                                value={formData.location}
-                                onChange={handleInputChange}
-                                placeholder="e.g. Chennai, Tamil Nadu"
-                                className="w-full px-3 py-2 bg-muted rounded-lg border border-input text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-                            />
-                        </div>
+                {/* Role Notice for restricted roles */}
+                {!canManage && (
+                    <div className="flex items-center gap-3 bg-muted rounded-xl border border-border px-4 py-3">
+                        <ShieldAlert size={18} className="text-warning flex-shrink-0" />
+                        <p className="text-sm text-muted-foreground">
+                            You have <strong className="text-foreground capitalize">{user?.role}</strong> access — view only.
+                        </p>
+                    </div>
+                )}
 
-                        <div className="grid grid-cols-2 gap-3">
+                {/* Add New Silo Form — admin/manager only */}
+                {canManage && (
+                    <div className="bg-card rounded-xl border border-border p-4 shadow-sm">
+                        <h3 className="font-semibold text-lg mb-4">Add New Silo</h3>
+                        <form onSubmit={handleSubmit} className="space-y-4">
                             <div className="space-y-1">
-                                <label className="text-xs font-medium text-muted-foreground">Latitude *</label>
+                                <label className="text-xs font-medium text-muted-foreground">Silo Name *</label>
                                 <input
                                     required
-                                    type="number"
-                                    step="any"
-                                    name="lat"
-                                    value={formData.lat}
+                                    name="name"
+                                    value={formData.name}
                                     onChange={handleInputChange}
-                                    placeholder="e.g. 13.0827"
+                                    placeholder="e.g. Chennai Silo G7"
                                     className="w-full px-3 py-2 bg-muted rounded-lg border border-input text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                                 />
                             </div>
+
                             <div className="space-y-1">
-                                <label className="text-xs font-medium text-muted-foreground">Longitude *</label>
+                                <label className="text-xs font-medium text-muted-foreground">Location Name</label>
                                 <input
-                                    required
-                                    type="number"
-                                    step="any"
-                                    name="lng"
-                                    value={formData.lng}
+                                    name="location"
+                                    value={formData.location}
                                     onChange={handleInputChange}
-                                    placeholder="e.g. 80.2707"
+                                    placeholder="e.g. Chennai, Tamil Nadu"
                                     className="w-full px-3 py-2 bg-muted rounded-lg border border-input text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                                 />
                             </div>
-                        </div>
 
-                        <div className="space-y-2">
-                            <label className="text-xs font-medium text-muted-foreground">Grain Type</label>
-                            <div className="flex flex-wrap gap-2">
-                                {GRAIN_TYPES.map((type) => (
-                                    <button
-                                        key={type}
-                                        type="button"
-                                        onClick={() => handleGrainTypeSelect(type)}
-                                        className={`px-3 py-1.5 rounded-lg text-sm transition-colors border ${formData.grainType === type
-                                            ? 'bg-primary/10 border-primary text-primary font-medium'
-                                            : 'bg-muted border-transparent text-muted-foreground hover:bg-muted/80'
-                                            }`}
-                                    >
-                                        {type}
-                                    </button>
-                                ))}
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className="space-y-1">
+                                    <label className="text-xs font-medium text-muted-foreground">Latitude *</label>
+                                    <input
+                                        required
+                                        type="number"
+                                        step="any"
+                                        name="lat"
+                                        value={formData.lat}
+                                        onChange={handleInputChange}
+                                        placeholder="e.g. 13.0827"
+                                        className="w-full px-3 py-2 bg-muted rounded-lg border border-input text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                    />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-xs font-medium text-muted-foreground">Longitude *</label>
+                                    <input
+                                        required
+                                        type="number"
+                                        step="any"
+                                        name="lng"
+                                        value={formData.lng}
+                                        onChange={handleInputChange}
+                                        placeholder="e.g. 80.2707"
+                                        className="w-full px-3 py-2 bg-muted rounded-lg border border-input text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                    />
+                                </div>
                             </div>
-                        </div>
 
-                        <div className="grid grid-cols-2 gap-3">
-                            <div className="space-y-1">
-                                <label className="text-xs font-medium text-muted-foreground">Amount (tons) *</label>
-                                <input
-                                    required
-                                    type="number"
-                                    name="amount"
-                                    value={formData.amount}
-                                    onChange={handleInputChange}
-                                    placeholder="e.g. 200"
-                                    className="w-full px-3 py-2 bg-muted rounded-lg border border-input text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-                                />
+                            <div className="space-y-2">
+                                <label className="text-xs font-medium text-muted-foreground">Grain Type</label>
+                                <div className="flex flex-wrap gap-2">
+                                    {GRAIN_TYPES.map((type) => (
+                                        <button
+                                            key={type}
+                                            type="button"
+                                            onClick={() => handleGrainTypeSelect(type)}
+                                            className={`px-3 py-1.5 rounded-lg text-sm transition-colors border ${formData.grainType === type
+                                                ? 'bg-primary/10 border-primary text-primary font-medium'
+                                                : 'bg-muted border-transparent text-muted-foreground hover:bg-muted/80'
+                                                }`}
+                                        >
+                                            {type}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
-                            <div className="space-y-1">
-                                <label className="text-xs font-medium text-muted-foreground">Capacity (tons) *</label>
-                                <input
-                                    required
-                                    type="number"
-                                    name="capacity"
-                                    value={formData.capacity}
-                                    onChange={handleInputChange}
-                                    placeholder="e.g. 500"
-                                    className="w-full px-3 py-2 bg-muted rounded-lg border border-input text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-                                />
-                            </div>
-                        </div>
 
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="w-full py-2.5 bg-primary text-primary-foreground rounded-lg font-semibold hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
-                        >
-                            {loading ? (
-                                <span className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full" />
-                            ) : (
-                                <>
-                                    <MapPin size={18} />
-                                    Add Silo to Map
-                                </>
-                            )}
-                        </button>
-                    </form>
-                </div>
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className="space-y-1">
+                                    <label className="text-xs font-medium text-muted-foreground">Amount (tons) *</label>
+                                    <input
+                                        required
+                                        type="number"
+                                        name="amount"
+                                        value={formData.amount}
+                                        onChange={handleInputChange}
+                                        placeholder="e.g. 200"
+                                        className="w-full px-3 py-2 bg-muted rounded-lg border border-input text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                    />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-xs font-medium text-muted-foreground">Capacity (tons) *</label>
+                                    <input
+                                        required
+                                        type="number"
+                                        name="capacity"
+                                        value={formData.capacity}
+                                        onChange={handleInputChange}
+                                        placeholder="e.g. 500"
+                                        className="w-full px-3 py-2 bg-muted rounded-lg border border-input text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                    />
+                                </div>
+                            </div>
+
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="w-full py-2.5 bg-primary text-primary-foreground rounded-lg font-semibold hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+                            >
+                                {loading ? (
+                                    <span className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full" />
+                                ) : (
+                                    <>
+                                        <MapPin size={18} />
+                                        Add Silo to Map
+                                    </>
+                                )}
+                            </button>
+                        </form>
+                    </div>
+                )}
 
                 {/* Registered Silos List */}
                 <div className="space-y-3">
@@ -260,12 +275,15 @@ const ManageSilos = ({ silos, isOpen, onClose }: ManageSilosProps) => {
                                     >
                                         {silo.status}
                                     </span>
-                                    <button
-                                        onClick={() => handleDelete(silo.id)}
-                                        className="p-2 text-destructive/80 hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
-                                    >
-                                        <Trash2 size={16} />
-                                    </button>
+                                    {canDelete && (
+                                        <button
+                                            onClick={() => handleDelete(silo.id)}
+                                            className="p-2 text-destructive/80 hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
+                                            title="Delete silo (Admin only)"
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         ))}

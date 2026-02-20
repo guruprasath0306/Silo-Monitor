@@ -1,5 +1,5 @@
 import { Silo, getStatusColor, getPestColor } from '@/data/silos';
-import { Thermometer, Droplets, Bug, Wheat, Package, Wind, X } from 'lucide-react';
+import { Thermometer, Droplets, Bug, Wheat, Package, Wind, X, MapPin } from 'lucide-react';
 
 interface SiloInfoPanelProps {
   silo: Silo;
@@ -18,9 +18,15 @@ const SiloInfoPanel = ({ silo, onClose }: SiloInfoPanelProps) => {
       >
         <div>
           <h2 className="text-foreground font-bold text-lg">{silo.name}</h2>
-          <p className="text-muted-foreground text-xs font-mono">
+          <a
+            href={`https://www.google.com/maps/search/?api=1&query=${silo.lat},${silo.lng}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-muted-foreground text-xs font-mono hover:text-primary hover:underline"
+            title="Open in Google Maps"
+          >
             {silo.lat.toFixed(4)}°N, {silo.lng.toFixed(4)}°E
-          </p>
+          </a>
         </div>
         <div className="flex items-center gap-2">
           <span
@@ -136,6 +142,19 @@ const SiloInfoPanel = ({ silo, onClose }: SiloInfoPanelProps) => {
             Treat
           </button>
         </div>
+      </div>
+
+      {/* Google Maps Link */}
+      <div className="px-4 pb-4">
+        <a
+          href={`https://www.google.com/maps/search/?api=1&query=${silo.lat},${silo.lng}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-center gap-2 w-full py-2 rounded-lg border border-border text-xs font-semibold text-muted-foreground hover:text-primary hover:border-primary hover:bg-primary/5 transition-colors"
+        >
+          <MapPin size={14} />
+          Open in Google Maps
+        </a>
       </div>
     </div>
   );
