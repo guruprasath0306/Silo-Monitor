@@ -3,7 +3,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Silo, SiloSensor, SILOS } from '@/data/silos';
 
 export function useSilos() {
-  const [silos, setSilos] = useState<Silo[]>([]);
+  // Initialize with static SILOS so they're visible immediately while Supabase loads
+  const [silos, setSilos] = useState<Silo[]>(SILOS);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,12 +34,16 @@ export function useSilos() {
         .order('name');
 
       if (fetchError) {
+        // On error, keep showing the 12 static mock silos
         setError(fetchError.message);
         setLoading(false);
         return;
       }
 
-      setSilos((data && data.length > 0) ? data.map(mapRow) : SILOS);
+      // If Supabase has rows use them, otherwise keep/show the 12 static silos
+      if (data && data.length > 0) {
+        setSilos(data.map(mapRow));
+      }
       setLoading(false);
     };
 
