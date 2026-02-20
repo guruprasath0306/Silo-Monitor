@@ -171,11 +171,11 @@ const Index = () => {
 
         {/* Top Stats Bar */}
         <div className="absolute top-3 z-10 flex gap-2 overflow-x-auto pb-1 hide-scrollbar"
-          style={{ left: '3.25rem', right: selectedSilo ? '0.75rem' : '0.75rem', maxWidth: 'calc(100% - 4rem)' }}>
+          style={{ left: '3.25rem', right: '3.25rem', maxWidth: 'calc(100% - 7rem)' }}>
           {[
-            { label: 'Total Silos', value: silos.length, color: 'primary' },
-            { label: 'Alerts', value: silos.filter((s) => s.status !== 'normal').length, color: 'warning' },
-            { label: 'Critical', value: silos.filter((s) => s.status === 'critical').length, color: 'destructive' },
+            { label: 'Total Silos', value: silos.length },
+            { label: 'Alerts', value: silos.filter((s) => s.status !== 'normal').length },
+            { label: 'Critical', value: silos.filter((s) => s.status === 'critical').length },
           ].map((stat) => (
             <div
               key={stat.label}
@@ -187,16 +187,39 @@ const Index = () => {
           ))}
         </div>
 
-        {/* Manage Silos Button */}
-        <div className="absolute bottom-4 right-4 z-10">
+        {/* User Profile & Logout — top right, always visible */}
+        <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5">
           <button
-            onClick={() => setShowManageSilos(!showManageSilos)}
-            className="bg-card/90 backdrop-blur-sm border border-border text-foreground px-3 py-2.5 md:px-4 md:py-2.5 rounded-xl font-semibold shadow-lg hover:bg-muted transition-colors flex items-center gap-2"
+            onClick={() => setShowCredentials(true)}
+            className="bg-card/90 backdrop-blur-sm border border-border flex items-center gap-2 px-2.5 py-2 rounded-xl shadow-lg hover:bg-muted transition-colors text-xs font-medium"
+            title="Change credentials"
           >
-            {showManageSilos ? <Plus className="rotate-45 transition-transform" /> : <Settings size={18} />}
-            <span className="hidden sm:inline text-sm">Manage Silos</span>
+            <User size={15} className="text-primary flex-shrink-0" />
+            <span className="hidden sm:inline max-w-[120px] truncate text-muted-foreground">
+              {currentUser?.email ?? currentUser?.role ?? 'Profile'}
+            </span>
+          </button>
+          <button
+            onClick={handleLogout}
+            className="bg-card/90 backdrop-blur-sm border border-border p-2.5 rounded-xl shadow-lg hover:bg-destructive/20 hover:border-destructive/50 hover:text-destructive transition-colors"
+            title="Sign out"
+          >
+            <LogOut size={15} />
           </button>
         </div>
+
+        {/* Manage Silos Open Button — bottom right */}
+        {!showManageSilos && (
+          <div className="absolute bottom-6 right-4 z-10">
+            <button
+              onClick={() => setShowManageSilos(true)}
+              className="bg-primary text-primary-foreground px-4 py-2.5 rounded-xl font-semibold shadow-xl hover:brightness-110 transition-all flex items-center gap-2 text-sm"
+            >
+              <Settings size={16} />
+              <span>Manage Silos</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Manage Silos Panel */}
@@ -205,25 +228,6 @@ const Index = () => {
         isOpen={showManageSilos}
         onClose={() => setShowManageSilos(false)}
       />
-
-      {/* Profile / credentials button — top right */}
-      <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
-        <button
-          onClick={() => setShowCredentials(true)}
-          className="profile-btn"
-          title="Change credentials"
-        >
-          <User size={15} />
-          <span className="hidden sm:inline">{currentUser?.email ?? currentUser?.role ?? 'Profile'}</span>
-        </button>
-        <button
-          onClick={handleLogout}
-          className="profile-btn"
-          title="Sign out"
-        >
-          <LogOut size={15} />
-        </button>
-      </div>
 
       {/* Change Credentials Modal */}
       <ChangeCredentials

@@ -96,9 +96,10 @@ const ManageSilos = ({ silos, isOpen, onClose }: ManageSilosProps) => {
                 </div>
                 <button
                     onClick={onClose}
-                    className="p-2 hover:bg-muted rounded-full transition-colors"
+                    className="p-2 hover:bg-destructive/10 hover:text-destructive rounded-xl transition-colors border border-transparent hover:border-destructive/30"
+                    title="Close"
                 >
-                    <X size={24} className="text-muted-foreground" />
+                    <X size={22} className="text-muted-foreground" />
                 </button>
             </div>
 
@@ -289,6 +290,17 @@ const ManageSilos = ({ silos, isOpen, onClose }: ManageSilosProps) => {
                         ))}
                     </div>
                 </div>
+            </div>
+
+            {/* Sticky Close Panel Button */}
+            <div className="border-t border-border p-4 bg-card flex-shrink-0">
+                <button
+                    onClick={onClose}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-muted hover:bg-muted/80 border border-border text-sm font-semibold text-muted-foreground hover:text-foreground transition-all"
+                >
+                    <X size={16} />
+                    Close Panel
+                </button>
             </div>
         </div>
     );
