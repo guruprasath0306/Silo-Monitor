@@ -5,8 +5,11 @@ import { useSilos } from '@/hooks/useSilos';
 import SiloInfoPanel from '@/components/SiloInfoPanel';
 import SiloList from '@/components/SiloList';
 import ManageSilos from '@/components/ManageSilos';
-import { Settings, Plus, Menu } from 'lucide-react';
+import ChangeCredentials from '@/components/ChangeCredentials';
+import { getCurrentUser } from '@/lib/credentials';
+import { Settings, Plus, Menu, User, LogOut } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { useNavigate } from 'react-router-dom';
 
 const MAP_STYLES: google.maps.MapTypeStyle[] = [
   { elementType: 'geometry', stylers: [{ color: '#1a1d23' }] },
@@ -59,10 +62,18 @@ const SiloMarker = ({ silo, isSelected, onClick }: { silo: Silo; isSelected: boo
 };
 
 const Index = () => {
+  const navigate = useNavigate();
+  const currentUser = getCurrentUser();
   const [selectedSilo, setSelectedSilo] = useState<Silo | null>(null);
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [showManageSilos, setShowManageSilos] = useState(false);
+  const [showCredentials, setShowCredentials] = useState(false);
   const { silos, loading: silosLoading, error: silosError } = useSilos();
+
+  const handleLogout = () => {
+    sessionStorage.removeItem('auth');
+    navigate('/login');
+  };
 
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: 'AIzaSyAbjdHGqv709iK21S2Zj3u3MUJu9xBnfIQ',
@@ -193,6 +204,31 @@ const Index = () => {
         silos={silos}
         isOpen={showManageSilos}
         onClose={() => setShowManageSilos(false)}
+      />
+
+      {/* Profile / credentials button — top right */}
+      <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
+        <button
+          onClick={() => setShowCredentials(true)}
+          className="profile-btn"
+          title="Change credentials"
+        >
+          <User size={15} />
+          <span className="hidden sm:inline">{currentUser?.email ?? currentUser?.role ?? 'Profile'}</span>
+        </button>
+        <button
+          onClick={handleLogout}
+          className="profile-btn"
+          title="Sign out"
+        >
+          <LogOut size={15} />
+        </button>
+      </div>
+
+      {/* Change Credentials Modal */}
+      <ChangeCredentials
+        isOpen={showCredentials}
+        onClose={() => setShowCredentials(false)}
       />
     </div>
   );

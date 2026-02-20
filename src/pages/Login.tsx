@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Wheat, ChevronDown, Lock, Mail, AlertCircle } from 'lucide-react';
+import { getCredentials } from '@/lib/credentials';
 
 const ROLES = [
     { value: 'admin', label: 'Administrator', description: 'Full system access' },
@@ -8,14 +9,6 @@ const ROLES = [
     { value: 'operator', label: 'Operator', description: 'Monitor & update readings' },
     { value: 'viewer', label: 'Viewer', description: 'Read-only access' },
 ];
-
-// Demo credentials per role
-const DEMO_CREDENTIALS: Record<string, { email: string; password: string }> = {
-    admin: { email: 'admin@farmsense.io', password: 'admin123' },
-    manager: { email: 'manager@farmsense.io', password: 'manager123' },
-    operator: { email: 'operator@farmsense.io', password: 'operator123' },
-    viewer: { email: 'viewer@farmsense.io', password: 'viewer123' },
-};
 
 export default function Login() {
     const navigate = useNavigate();
@@ -42,19 +35,22 @@ export default function Login() {
         }
 
         setLoading(true);
-        // Simulate API call
-        await new Promise((res) => setTimeout(res, 1200));
+        // Simulate short auth delay
+        await new Promise((res) => setTimeout(res, 800));
 
-        const demo = DEMO_CREDENTIALS[role];
-        if (
-            (emailOrUsername === demo.email || emailOrUsername === role) &&
-            password === demo.password
-        ) {
-            // Store auth info and navigate
+        // Read stored (or default) credentials for the selected role
+        const stored = getCredentials(role);
+        const emailMatch = emailOrUsername === stored.email || emailOrUsername === role;
+        const passMatch = password === stored.password;
+
+        if (emailMatch && passMatch) {
             sessionStorage.setItem('auth', JSON.stringify({ email: emailOrUsername, role }));
             navigate('/');
         } else {
-            setError('Invalid credentials. Use the demo credentials shown below.');
+            setError(
+                `Invalid credentials for ${ROLES.find(r => r.value === role)?.label}. ` +
+                `Check your email/password or reset them from the dashboard.`
+            );
         }
         setLoading(false);
     };
@@ -271,17 +267,20 @@ export default function Login() {
                         </button>
                     </div>
 
-                    {/* Demo credentials hint */}
+                    {/* Hint for first-time users */}
                     {role && (
                         <div className="demo-credentials">
                             <p className="text-xs text-muted-foreground mb-1 font-medium uppercase tracking-wide">
-                                Demo credentials for {selectedRole?.label}
+                                Default credentials for {selectedRole?.label}
                             </p>
                             <p className="text-xs font-mono text-foreground/80">
-                                📧 {DEMO_CREDENTIALS[role].email}
+                                📧 {role}@farmsense.io
                             </p>
                             <p className="text-xs font-mono text-foreground/80">
-                                🔑 {DEMO_CREDENTIALS[role].password}
+                                🔑 {role}123
+                            </p>
+                            <p className="text-xs text-muted-foreground/60 mt-1">
+                                You can change these from the dashboard → Profile Settings
                             </p>
                         </div>
                     )}
