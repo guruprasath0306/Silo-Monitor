@@ -238,9 +238,16 @@ const ManageSilos = ({ silos, isOpen, onClose }: ManageSilosProps) => {
 
                                 <div className="flex-1 min-w-0">
                                     <h4 className="font-medium text-sm truncate">{silo.name}</h4>
-                                    <p className="text-xs text-muted-foreground truncate">
-                                        {silo.lat.toFixed(4)}, {silo.lng.toFixed(4)} · {silo.grainType}
-                                    </p>
+                                    <a
+                                        href={`https://www.google.com/maps/search/?api=1&query=${silo.lat},${silo.lng}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-xs text-muted-foreground truncate hover:text-primary hover:underline"
+                                        title="Open in Google Maps"
+                                    >
+                                        {silo.lat.toFixed(4)}, {silo.lng.toFixed(4)}
+                                    </a>
+                                    <span className="text-xs text-muted-foreground"> · {silo.grainType}</span>
                                 </div>
 
                                 <div className="flex items-center gap-2">
