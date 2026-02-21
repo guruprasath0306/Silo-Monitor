@@ -128,7 +128,7 @@ export default function Login() {
                         <div className="logo-ring mb-4">
                             <Wheat size={32} className="text-primary" />
                         </div>
-                        <h1 className="text-2xl font-bold text-foreground tracking-tight">FarmSense Hub</h1>
+                        <h1 className="text-2xl font-bold text-foreground tracking-tight">Silo Monitor</h1>
                         <p className="text-muted-foreground text-sm mt-1">Silo Monitoring System</p>
                     </div>
 
