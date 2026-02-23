@@ -167,7 +167,8 @@
 .login-bg {
   background: hsl(var(--background));
   position: relative;
-  overflow: hidden;
+  overflow-y: auto;
+  min-height: 100vh;
 }
 
 /* Animated background orbs */
@@ -347,8 +348,24 @@
   border-radius: 0.75rem;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
   z-index: 50;
-  overflow: hidden;
+  overflow-y: auto;
+  max-height: 220px;
   animation: dropdown-in 0.15s ease;
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--border)) transparent;
+}
+
+.role-dropdown::-webkit-scrollbar {
+  width: 4px;
+}
+
+.role-dropdown::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.role-dropdown::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 2px;
 }
 
 @keyframes dropdown-in {
