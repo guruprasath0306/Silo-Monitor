@@ -6,7 +6,7 @@ const ROLES = [
     { value: 'admin', label: 'Administrator', description: 'Full system access' },
     { value: 'manager', label: 'Farm Manager', description: 'Manage silos & reports' },
     { value: 'operator', label: 'Operator', description: 'Monitor & update readings' },
-    { value: 'viewer', label: 'Viewer', description: 'Read-only access' },
+    { value: 'driver', label: 'Driver', description: 'Delivers load to different silos' },
 ];
 
 export default function Login() {
