@@ -68,7 +68,7 @@ const Index = () => {
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [showManageSilos, setShowManageSilos] = useState(false);
   const [showCredentials, setShowCredentials] = useState(false);
-  const { silos, loading: silosLoading, error: silosError } = useSilos();
+  const { silos, setSilos, loading: silosLoading, error: silosError } = useSilos();
 
   const handleLogout = () => {
     sessionStorage.removeItem('auth');
@@ -227,6 +227,8 @@ const Index = () => {
         silos={silos}
         isOpen={showManageSilos}
         onClose={() => setShowManageSilos(false)}
+        onSiloAdded={(newSilo) => setSilos((prev) => [...prev, newSilo])}
+        onSiloDeleted={(id) => setSilos((prev) => prev.filter((s) => s.id !== id))}
       />
 
       {/* Change Credentials Modal */}

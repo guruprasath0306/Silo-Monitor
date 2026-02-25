@@ -1,5 +1,5 @@
 import { Silo, getStatusColor, getPestColor } from '@/data/silos';
-import { Thermometer, Droplets, Bug, Wheat, Package, Wind, X, MapPin } from 'lucide-react';
+import { Thermometer, Droplets, Bug, Wheat, Package, Wind, X, MapPin, Phone } from 'lucide-react';
 
 interface SiloInfoPanelProps {
   silo: Silo;
@@ -146,6 +146,30 @@ const SiloInfoPanel = ({ silo, onClose }: SiloInfoPanelProps) => {
             </button>
           </div>
         </div>
+
+        {/* Owner Contact */}
+        {silo.ownerPhone && (
+          <div className="px-4 pb-3">
+            <div className="bg-muted rounded-lg px-4 py-3 flex items-center justify-between">
+              <div>
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-0.5">Owner Contact</p>
+                <a
+                  href={`tel:${silo.ownerPhone}`}
+                  className="text-sm font-semibold text-foreground hover:text-primary transition-colors"
+                >
+                  {silo.ownerPhone}
+                </a>
+              </div>
+              <a
+                href={`tel:${silo.ownerPhone}`}
+                className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
+                title="Call owner"
+              >
+                <Phone size={16} className="text-primary" />
+              </a>
+            </div>
+          </div>
+        )}
 
         {/* Google Maps Link */}
         <div className="px-4 pb-4 pb-safe">

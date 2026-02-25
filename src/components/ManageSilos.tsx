@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Silo, getStatusColor } from '@/data/silos';
-import { X, Plus, Trash2, Wheat, MapPin, ShieldAlert } from 'lucide-react';
+import { X, Trash2, Wheat, MapPin, ShieldAlert } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
@@ -9,11 +9,13 @@ interface ManageSilosProps {
     silos: Silo[];
     isOpen: boolean;
     onClose: () => void;
+    onSiloAdded?: (silo: Silo) => void;
+    onSiloDeleted?: (id: string) => void;
 }
 
 const GRAIN_TYPES = ['Rice', 'Wheat', 'Maize', 'Millet'];
 
-const ManageSilos = ({ silos, isOpen, onClose }: ManageSilosProps) => {
+const ManageSilos = ({ silos, isOpen, onClose, onSiloAdded, onSiloDeleted }: ManageSilosProps) => {
     const { user, canManage, canDelete } = useAuth();
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
@@ -24,6 +26,7 @@ const ManageSilos = ({ silos, isOpen, onClose }: ManageSilosProps) => {
         grainType: 'Rice',
         amount: '',
         capacity: '',
+        phone: '',
     });
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,7 +43,8 @@ const ManageSilos = ({ silos, isOpen, onClose }: ManageSilosProps) => {
         setLoading(true);
 
         try {
-            const { error } = await supabase.from('silos').insert({
+            const now = new Date().toISOString();
+            const { data, error } = await supabase.from('silos').insert({
                 name: formData.name,
                 latitude: parseFloat(formData.lat),
                 longitude: parseFloat(formData.lng),
@@ -48,24 +52,39 @@ const ManageSilos = ({ silos, isOpen, onClose }: ManageSilosProps) => {
                 grain_amount: parseFloat(formData.amount),
                 capacity: parseFloat(formData.capacity),
                 status: 'normal',
-                temperature: 25, // Default
-                humidity: 50, // Default
-                pest_activity: 'none', // Default
-                co2_level: 400, // Default
-            });
+                temperature: 25,
+                humidity: 50,
+                pest_activity: 'none',
+                co2_level: 400,
+                last_updated: now,
+                owner_phone: formData.phone || null,
+            }).select().single();
 
             if (error) throw error;
 
-            toast.success('Silo added successfully');
-            setFormData({
-                name: '',
-                location: '',
-                lat: '',
-                lng: '',
-                grainType: 'Rice',
-                amount: '',
-                capacity: '',
-            });
+            // Build a local Silo object so the map updates instantly
+            const newSilo: Silo = {
+                id: data?.id ?? `local-${Date.now()}`,
+                name: formData.name,
+                lat: parseFloat(formData.lat),
+                lng: parseFloat(formData.lng),
+                grainType: formData.grainType,
+                grainAmount: parseFloat(formData.amount),
+                capacity: parseFloat(formData.capacity),
+                sensors: {
+                    temperature: 25,
+                    humidity: 50,
+                    pestActivity: 'none',
+                    co2Level: 400,
+                },
+                status: 'normal',
+                lastUpdated: now,
+                ownerPhone: formData.phone || undefined,
+            };
+            onSiloAdded?.(newSilo);
+
+            toast.success(`"${formData.name}" added to map!`);
+            setFormData({ name: '', location: '', lat: '', lng: '', grainType: 'Rice', amount: '', capacity: '', phone: '' });
         } catch (error: any) {
             toast.error('Failed to add silo: ' + error.message);
         } finally {
@@ -79,6 +98,7 @@ const ManageSilos = ({ silos, isOpen, onClose }: ManageSilosProps) => {
         try {
             const { error } = await supabase.from('silos').delete().eq('id', id);
             if (error) throw error;
+            onSiloDeleted?.(id);
             toast.success('Silo deleted successfully');
         } catch (error: any) {
             toast.error('Failed to delete silo: ' + error.message);
@@ -216,6 +236,18 @@ const ManageSilos = ({ silos, isOpen, onClose }: ManageSilosProps) => {
                                         className="w-full min-h-[44px] px-3 py-2.5 bg-muted rounded-lg border border-input text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                                     />
                                 </div>
+                            </div>
+
+                            <div className="space-y-1">
+                                <label className="text-xs font-medium text-muted-foreground">Owner Mobile Number</label>
+                                <input
+                                    type="tel"
+                                    name="phone"
+                                    value={formData.phone}
+                                    onChange={handleInputChange}
+                                    placeholder="e.g. +91 98765 43210"
+                                    className="w-full min-h-[44px] px-3 py-2.5 bg-muted rounded-lg border border-input text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                />
                             </div>
 
                             <button

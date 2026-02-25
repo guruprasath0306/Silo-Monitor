@@ -16,6 +16,7 @@ export interface Silo {
   sensors: SiloSensor;
   status: 'normal' | 'warning' | 'critical';
   lastUpdated: string;
+  ownerPhone?: string;
 }
 
 export const SILOS: Silo[] = [

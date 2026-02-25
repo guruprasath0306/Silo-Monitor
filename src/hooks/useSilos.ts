@@ -24,29 +24,30 @@ export function useSilos() {
     },
     status: row.status as Silo['status'],
     lastUpdated: row.last_updated,
+    ownerPhone: row.owner_phone ?? undefined,
   });
 
-  useEffect(() => {
-    const fetchSilos = async () => {
-      const { data, error: fetchError } = await supabase
-        .from('silos')
-        .select('*')
-        .order('name');
+  const fetchSilos = async () => {
+    const { data, error: fetchError } = await supabase
+      .from('silos')
+      .select('*')
+      .order('name');
 
-      if (fetchError) {
-        // On error, keep showing the 12 static mock silos
-        setError(fetchError.message);
-        setLoading(false);
-        return;
-      }
-
-      // If Supabase has rows use them, otherwise keep/show the 12 static silos
-      if (data && data.length > 0) {
-        setSilos(data.map(mapRow));
-      }
+    if (fetchError) {
+      // On error, keep showing the 12 static mock silos
+      setError(fetchError.message);
       setLoading(false);
-    };
+      return;
+    }
 
+    // If Supabase has rows use them, otherwise keep/show the 12 static silos
+    if (data && data.length > 0) {
+      setSilos(data.map(mapRow));
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
     fetchSilos();
 
     // Realtime subscription
@@ -74,5 +75,5 @@ export function useSilos() {
     };
   }, []);
 
-  return { silos, loading, error };
+  return { silos, setSilos, loading, error, refetch: fetchSilos };
 }
