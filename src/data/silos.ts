@@ -31,6 +31,7 @@ export const SILOS: Silo[] = [
     sensors: { temperature: 28.5, humidity: 62, pestActivity: 'none', co2Level: 380 },
     status: 'normal',
     lastUpdated: '2026-02-09T08:30:00',
+    ownerPhone: '+91 94430 11201',
   },
   {
     id: 'silo-002',
@@ -43,6 +44,7 @@ export const SILOS: Silo[] = [
     sensors: { temperature: 34.2, humidity: 78, pestActivity: 'moderate', co2Level: 520 },
     status: 'warning',
     lastUpdated: '2026-02-09T08:28:00',
+    ownerPhone: '+91 98421 33902',
   },
   {
     id: 'silo-003',
@@ -55,6 +57,7 @@ export const SILOS: Silo[] = [
     sensors: { temperature: 30.1, humidity: 55, pestActivity: 'low', co2Level: 400 },
     status: 'normal',
     lastUpdated: '2026-02-09T08:25:00',
+    ownerPhone: '+91 73970 44503',
   },
   {
     id: 'silo-004',
@@ -67,6 +70,7 @@ export const SILOS: Silo[] = [
     sensors: { temperature: 38.7, humidity: 85, pestActivity: 'high', co2Level: 680 },
     status: 'critical',
     lastUpdated: '2026-02-09T08:32:00',
+    ownerPhone: '+91 87540 55604',
   },
   {
     id: 'silo-005',
@@ -79,6 +83,7 @@ export const SILOS: Silo[] = [
     sensors: { temperature: 27.3, humidity: 48, pestActivity: 'none', co2Level: 350 },
     status: 'normal',
     lastUpdated: '2026-02-09T08:20:00',
+    ownerPhone: '+91 96290 66705',
   },
   {
     id: 'silo-006',
@@ -91,6 +96,7 @@ export const SILOS: Silo[] = [
     sensors: { temperature: 31.5, humidity: 70, pestActivity: 'low', co2Level: 410 },
     status: 'normal',
     lastUpdated: '2026-02-09T08:18:00',
+    ownerPhone: '+91 63820 77806',
   },
   {
     id: 'silo-007',
@@ -103,6 +109,7 @@ export const SILOS: Silo[] = [
     sensors: { temperature: 36.0, humidity: 82, pestActivity: 'moderate', co2Level: 590 },
     status: 'warning',
     lastUpdated: '2026-02-09T08:15:00',
+    ownerPhone: '+91 77180 88107',
   },
   {
     id: 'silo-008',
@@ -115,6 +122,7 @@ export const SILOS: Silo[] = [
     sensors: { temperature: 29.8, humidity: 60, pestActivity: 'none', co2Level: 370 },
     status: 'normal',
     lastUpdated: '2026-02-09T08:22:00',
+    ownerPhone: '+91 99470 99208',
   },
   {
     id: 'silo-009',
@@ -127,6 +135,7 @@ export const SILOS: Silo[] = [
     sensors: { temperature: 33.2, humidity: 72, pestActivity: 'low', co2Level: 450 },
     status: 'warning',
     lastUpdated: '2026-02-20T10:00:00',
+    ownerPhone: '+91 81440 10309',
   },
   {
     id: 'silo-010',
@@ -139,6 +148,7 @@ export const SILOS: Silo[] = [
     sensors: { temperature: 29.0, humidity: 58, pestActivity: 'none', co2Level: 360 },
     status: 'normal',
     lastUpdated: '2026-02-20T10:05:00',
+    ownerPhone: '+91 90030 21410',
   },
   {
     id: 'silo-011',
@@ -151,6 +161,7 @@ export const SILOS: Silo[] = [
     sensors: { temperature: 37.8, humidity: 80, pestActivity: 'high', co2Level: 720 },
     status: 'critical',
     lastUpdated: '2026-02-20T10:10:00',
+    ownerPhone: '+91 95550 32511',
   },
   {
     id: 'silo-012',
@@ -163,6 +174,7 @@ export const SILOS: Silo[] = [
     sensors: { temperature: 28.0, humidity: 52, pestActivity: 'none', co2Level: 340 },
     status: 'normal',
     lastUpdated: '2026-02-20T10:15:00',
+    ownerPhone: '+91 84260 43612',
   },
 ];
 

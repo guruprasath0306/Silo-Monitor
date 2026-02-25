@@ -69,6 +69,8 @@ const Index = () => {
   const [showManageSilos, setShowManageSilos] = useState(false);
   const [showCredentials, setShowCredentials] = useState(false);
   const { silos, setSilos, loading: silosLoading, error: silosError } = useSilos();
+  const [pickingLocation, setPickingLocation] = useState(false);
+  const [pickedCoords, setPickedCoords] = useState<{ lat: number; lng: number } | null>(null);
 
   const handleLogout = () => {
     sessionStorage.removeItem('auth');
@@ -87,6 +89,16 @@ const Index = () => {
     setSelectedSilo(silo);
     map?.panTo({ lat: silo.lat, lng: silo.lng });
     map?.setZoom(12);
+  };
+
+  const handleMapClick = (e: google.maps.MapMouseEvent) => {
+    if (!pickingLocation) return;
+    const lat = e.latLng?.lat();
+    const lng = e.latLng?.lng();
+    if (lat !== undefined && lng !== undefined) {
+      setPickedCoords({ lat, lng });
+      setPickingLocation(false);
+    }
   };
 
   if (!isLoaded || silosLoading) {
@@ -120,6 +132,7 @@ const Index = () => {
           center={TAMIL_NADU_CENTER}
           zoom={7}
           onLoad={onLoad}
+          onClick={handleMapClick}
           options={{
             styles: MAP_STYLES,
             disableDefaultUI: true,
@@ -127,6 +140,7 @@ const Index = () => {
             mapTypeControl: false,
             streetViewControl: false,
             fullscreenControl: false,
+            draggableCursor: pickingLocation ? 'crosshair' : undefined,
           }}
         >
           {silos.map((silo) => (
@@ -166,7 +180,14 @@ const Index = () => {
 
         {/* Info Panel */}
         {selectedSilo && (
-          <SiloInfoPanel silo={selectedSilo} onClose={() => setSelectedSilo(null)} />
+          <SiloInfoPanel
+            silo={selectedSilo}
+            onClose={() => setSelectedSilo(null)}
+            onDelete={(id) => {
+              setSilos((prev) => prev.filter((s) => s.id !== id));
+              setSelectedSilo(null);
+            }}
+          />
         )}
 
         {/* Top Stats Bar */}
@@ -226,9 +247,13 @@ const Index = () => {
       <ManageSilos
         silos={silos}
         isOpen={showManageSilos}
-        onClose={() => setShowManageSilos(false)}
+        onClose={() => { setShowManageSilos(false); setPickingLocation(false); setPickedCoords(null); }}
         onSiloAdded={(newSilo) => setSilos((prev) => [...prev, newSilo])}
         onSiloDeleted={(id) => setSilos((prev) => prev.filter((s) => s.id !== id))}
+        onSiloUpdated={(updated) => setSilos((prev) => prev.map((s) => s.id === updated.id ? updated : s))}
+        pickingLocation={pickingLocation}
+        onTogglePickLocation={() => { setPickingLocation((v) => !v); setPickedCoords(null); }}
+        pickedCoords={pickedCoords}
       />
 
       {/* Change Credentials Modal */}

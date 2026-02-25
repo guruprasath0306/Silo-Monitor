@@ -39,7 +39,7 @@ export function useAuth() {
     };
 
     const canManage = user?.role === 'admin' || user?.role === 'manager';
-    const canDelete = user?.role === 'admin';
+    const canDelete = user?.role === 'admin' || user?.role === 'manager';
 
     return { user, logout, canManage, canDelete };
 }

@@ -1,12 +1,15 @@
 import { Silo, getStatusColor, getPestColor } from '@/data/silos';
-import { Thermometer, Droplets, Bug, Wheat, Package, Wind, X, MapPin, Phone } from 'lucide-react';
+import { Thermometer, Droplets, Bug, Wheat, Package, Wind, X, MapPin, Phone, Trash2 } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 
 interface SiloInfoPanelProps {
   silo: Silo;
   onClose: () => void;
+  onDelete?: (id: string) => void;
 }
 
-const SiloInfoPanel = ({ silo, onClose }: SiloInfoPanelProps) => {
+const SiloInfoPanel = ({ silo, onClose, onDelete }: SiloInfoPanelProps) => {
+  const { canDelete } = useAuth();
   const fillPercent = Math.round((silo.grainAmount / silo.capacity) * 100);
 
   return (
@@ -154,18 +157,18 @@ const SiloInfoPanel = ({ silo, onClose }: SiloInfoPanelProps) => {
               <div>
                 <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-0.5">Owner Contact</p>
                 <a
-                  href={`tel:${silo.ownerPhone}`}
+                  href={`tel:${silo.ownerPhone.replace(/\s+/g, '')}`}
                   className="text-sm font-semibold text-foreground hover:text-primary transition-colors"
                 >
                   {silo.ownerPhone}
                 </a>
               </div>
               <a
-                href={`tel:${silo.ownerPhone}`}
-                className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
+                href={`tel:${silo.ownerPhone.replace(/\s+/g, '')}`}
+                className="w-10 h-10 rounded-full bg-green-500/15 flex items-center justify-center hover:bg-green-500/30 transition-colors"
                 title="Call owner"
               >
-                <Phone size={16} className="text-primary" />
+                <Phone size={18} className="text-green-500" />
               </a>
             </div>
           </div>
@@ -183,6 +186,23 @@ const SiloInfoPanel = ({ silo, onClose }: SiloInfoPanelProps) => {
             Open in Google Maps
           </a>
         </div>
+        {/* Delete Silo */}
+        {canDelete && onDelete && (
+          <div className="px-4 pb-4">
+            <button
+              onClick={() => {
+                if (confirm(`Delete "${silo.name}"? This cannot be undone.`)) {
+                  onDelete(silo.id);
+                  onClose();
+                }
+              }}
+              className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg border border-destructive/40 text-xs font-semibold text-destructive hover:bg-destructive hover:text-destructive-foreground transition-colors"
+            >
+              <Trash2 size={14} />
+              Delete Silo
+            </button>
+          </div>
+        )}
       </div>{/* end scrollable content */}
     </div>
   );
