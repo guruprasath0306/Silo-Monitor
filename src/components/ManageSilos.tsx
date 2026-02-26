@@ -59,7 +59,7 @@ const ManageSilos = ({
         setFormData((prev) => ({ ...prev, grainType: type }));
     };
 
-    // ─── ADD new silo (local-first, Supabase in background) ─────────────────
+    // ─── ADD new silo (Supabase-first — persists across refresh & all devices) ──
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
@@ -67,43 +67,48 @@ const ManageSilos = ({
         try {
             const now = new Date().toISOString();
 
+            const { data, error: insertError } = await supabase
+                .from('silos')
+                .insert({
+                    name: formData.name,
+                    latitude: parseFloat(formData.lat),
+                    longitude: parseFloat(formData.lng),
+                    grain_type: formData.grainType,
+                    grain_amount: parseFloat(formData.amount),
+                    capacity: parseFloat(formData.capacity),
+                    status: 'normal',
+                    temperature: 25,
+                    humidity: 50,
+                    pest_activity: 'none',
+                    co2_level: 400,
+                    last_updated: now,
+                    owner_phone: formData.phone || null,
+                })
+                .select()
+                .single();
+
+            if (insertError) throw insertError;
+
+            // Build the Silo object with the real Supabase-assigned UUID
             const newSilo: Silo = {
-                id: `local-${Date.now()}`,
-                name: formData.name,
-                lat: parseFloat(formData.lat),
-                lng: parseFloat(formData.lng),
-                grainType: formData.grainType,
-                grainAmount: parseFloat(formData.amount),
-                capacity: parseFloat(formData.capacity),
+                id: data.id,
+                name: data.name,
+                lat: data.latitude,
+                lng: data.longitude,
+                grainType: data.grain_type,
+                grainAmount: Number(data.grain_amount),
+                capacity: Number(data.capacity),
                 sensors: { temperature: 25, humidity: 50, pestActivity: 'none', co2Level: 400 },
                 status: 'normal',
                 lastUpdated: now,
                 ownerPhone: formData.phone || undefined,
             };
+
             onSiloAdded?.(newSilo);
             toast.success(`"${formData.name}" added to map!`);
             setFormData({ name: '', location: '', lat: '', lng: '', grainType: 'Rice', amount: '', capacity: '', phone: '' });
 
-            // Turn off pick mode after adding
             if (pickingLocation) onTogglePickLocation?.();
-
-            supabase.from('silos').insert({
-                name: newSilo.name,
-                latitude: newSilo.lat,
-                longitude: newSilo.lng,
-                grain_type: newSilo.grainType,
-                grain_amount: newSilo.grainAmount,
-                capacity: newSilo.capacity,
-                status: 'normal',
-                temperature: 25,
-                humidity: 50,
-                pest_activity: 'none',
-                co2_level: 400,
-                last_updated: now,
-                owner_phone: formData.phone || null,
-            }).then(({ error }) => {
-                if (error) console.warn('Supabase sync failed:', error.message);
-            });
 
         } catch (error: any) {
             toast.error('Failed to add silo: ' + error.message);

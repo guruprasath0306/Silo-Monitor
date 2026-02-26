@@ -3,8 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Silo, SiloSensor, SILOS } from '@/data/silos';
 
 export function useSilos() {
-  // Initialize with static SILOS so they're visible immediately while Supabase loads
-  const [silos, setSilos] = useState<Silo[]>(SILOS);
+  const [silos, setSilos] = useState<Silo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -34,23 +33,55 @@ export function useSilos() {
       .order('name');
 
     if (fetchError) {
-      // On error, keep showing the 12 static mock silos
       setError(fetchError.message);
+      // Show static silos as fallback so the map isn't empty
+      setSilos(SILOS);
       setLoading(false);
       return;
     }
 
-    // If Supabase has rows use them, otherwise keep/show the 12 static silos
     if (data && data.length > 0) {
+      // Supabase has data — use it (this is the source of truth for all devices)
       setSilos(data.map(mapRow));
+      setLoading(false);
+    } else {
+      // First time: table is empty — seed it with the 12 static silos
+      const seedRows = SILOS.map((s) => ({
+        name: s.name,
+        latitude: s.lat,
+        longitude: s.lng,
+        grain_type: s.grainType,
+        grain_amount: s.grainAmount,
+        capacity: s.capacity,
+        status: s.status,
+        temperature: s.sensors.temperature,
+        humidity: s.sensors.humidity,
+        pest_activity: s.sensors.pestActivity,
+        co2_level: s.sensors.co2Level ?? null,
+        last_updated: s.lastUpdated,
+        owner_phone: s.ownerPhone ?? null,
+      }));
+
+      const { error: seedError } = await supabase.from('silos').insert(seedRows);
+
+      if (seedError) {
+        console.warn('Seeding failed, using static data:', seedError.message);
+        setSilos(SILOS);
+        setLoading(false);
+        return;
+      }
+
+      // Fetch again to get real DB-assigned UUIDs
+      const { data: seeded } = await supabase.from('silos').select('*').order('name');
+      setSilos(seeded ? seeded.map(mapRow) : SILOS);
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   useEffect(() => {
     fetchSilos();
 
-    // Realtime subscription
+    // Realtime subscription — keeps all devices in sync
     const channel = supabase
       .channel('silos-realtime')
       .on(
@@ -58,7 +89,11 @@ export function useSilos() {
         { event: '*', schema: 'public', table: 'silos' },
         (payload) => {
           if (payload.eventType === 'INSERT') {
-            setSilos((prev) => [...prev, mapRow(payload.new)]);
+            setSilos((prev) => {
+              // Avoid duplicates (in case the adding device also optimistically added it)
+              if (prev.some((s) => s.id === payload.new.id)) return prev;
+              return [...prev, mapRow(payload.new)];
+            });
           } else if (payload.eventType === 'UPDATE') {
             setSilos((prev) =>
               prev.map((s) => (s.id === payload.new.id ? mapRow(payload.new) : s))

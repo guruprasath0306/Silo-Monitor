@@ -1,13 +1,6 @@
 import { useState } from 'react';
 import { X, Eye, EyeOff, Lock, Mail, Shield, CheckCircle, AlertCircle, RotateCcw } from 'lucide-react';
-import { getCredentials, updateCredentials, DEFAULT_CREDENTIALS, getCurrentUser } from '@/lib/credentials';
-
-const ROLES = [
-    { value: 'admin', label: 'Administrator' },
-    { value: 'manager', label: 'Farm Manager' },
-    { value: 'operator', label: 'Operator' },
-    { value: 'viewer', label: 'Viewer' },
-];
+import { updateCredentials, DEFAULT_CREDENTIALS } from '@/lib/credentials';
 
 interface Props {
     isOpen: boolean;
@@ -15,28 +8,14 @@ interface Props {
 }
 
 export default function ChangeCredentials({ isOpen, onClose }: Props) {
-    const currentUser = getCurrentUser();
-    // Default to current user's role tab
-    const [activeRole, setActiveRole] = useState(currentUser?.role ?? 'admin');
-
-    const creds = getCredentials(activeRole);
-    const [email, setEmail] = useState(creds.email);
-    const [password, setPassword] = useState(creds.password);
+    const adminCreds = DEFAULT_CREDENTIALS['admin'];
+    const [email, setEmail] = useState(adminCreds.email);
+    const [password, setPassword] = useState(adminCreds.password);
     const [confirmPass, setConfirmPass] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
     const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
     const [statusMsg, setStatusMsg] = useState('');
-
-    const handleRoleChange = (role: string) => {
-        setActiveRole(role);
-        setStatus('idle');
-        setStatusMsg('');
-        const c = getCredentials(role);
-        setEmail(c.email);
-        setPassword(c.password);
-        setConfirmPass('');
-    };
 
     const handleSave = (e: React.FormEvent) => {
         e.preventDefault();
@@ -44,7 +23,7 @@ export default function ChangeCredentials({ isOpen, onClose }: Props) {
 
         if (!email.trim()) {
             setStatus('error');
-            setStatusMsg('Email / username cannot be empty.');
+            setStatusMsg('Email cannot be empty.');
             return;
         }
         if (password.length < 6) {
@@ -58,14 +37,14 @@ export default function ChangeCredentials({ isOpen, onClose }: Props) {
             return;
         }
 
-        updateCredentials(activeRole, email.trim(), password);
+        updateCredentials('admin', email.trim(), password);
         setStatus('success');
-        setStatusMsg(`Credentials updated for ${ROLES.find(r => r.value === activeRole)?.label}!`);
+        setStatusMsg('Administrator credentials updated!');
         setConfirmPass('');
     };
 
     const handleReset = () => {
-        const def = DEFAULT_CREDENTIALS[activeRole];
+        const def = DEFAULT_CREDENTIALS['admin'];
         setEmail(def.email);
         setPassword(def.password);
         setConfirmPass('');
@@ -94,20 +73,12 @@ export default function ChangeCredentials({ isOpen, onClose }: Props) {
                     </button>
                 </div>
 
-                {/* Role tabs */}
+                {/* Admin badge */}
                 <div className="cc-tabs">
-                    {ROLES.map((r) => (
-                        <button
-                            key={r.value}
-                            className={`cc-tab ${activeRole === r.value ? 'cc-tab-active' : ''}`}
-                            onClick={() => handleRoleChange(r.value)}
-                        >
-                            {r.label}
-                            {currentUser?.role === r.value && (
-                                <span className="cc-you-badge">you</span>
-                            )}
-                        </button>
-                    ))}
+                    <div className="cc-tab cc-tab-active">
+                        Administrator
+                        <span className="cc-you-badge">you</span>
+                    </div>
                 </div>
 
                 {/* Form */}

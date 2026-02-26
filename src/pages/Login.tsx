@@ -23,20 +23,34 @@ export default function Login() {
     const [forgotSent, setForgotSent] = useState(false);
 
     const selectedRole = ROLES.find((r) => r.value === role);
+    const isAdmin = role === 'admin';
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
 
-        if (!emailOrUsername || !password || !role) {
-            setError('Please fill in all fields including role selection.');
+        if (!role) {
+            setError('Please select your role.');
             return;
         }
 
+        if (role === 'admin') {
+            if (!emailOrUsername || !password) {
+                setError('Please enter email and password for admin role.');
+                return;
+            }
+            if (emailOrUsername !== 'guruprasathveeramuthu@gmail.com' || password !== 'guru@03') {
+                setError('Invalid admin credentials.');
+                return;
+            }
+        }
+        // For non-admin roles, no specific credential check is needed here,
+        // as they are designed to log in directly after role selection.
+
         setLoading(true);
-        // Simulate auth — accepts any non-empty credentials
+        // Simulate auth
         await new Promise((res) => setTimeout(res, 800));
-        sessionStorage.setItem('auth', JSON.stringify({ email: emailOrUsername, role }));
+        sessionStorage.setItem('auth', JSON.stringify({ email: emailOrUsername || `user_${role}`, role }));
         navigate('/');
         setLoading(false);
     };
@@ -141,47 +155,51 @@ export default function Login() {
                     )}
 
                     <form onSubmit={handleLogin} className="space-y-5">
-                        {/* Email / Username */}
-                        <div className="input-group">
-                            <label className="input-label">Email or Username</label>
-                            <div className="input-wrapper">
-                                <Mail size={16} className="input-icon" />
-                                <input
-                                    id="email"
-                                    type="text"
-                                    className="login-input"
-                                    placeholder="admin@farmsense.io"
-                                    value={emailOrUsername}
-                                    onChange={(e) => setEmailOrUsername(e.target.value)}
-                                    autoComplete="username"
-                                />
-                            </div>
-                        </div>
 
-                        {/* Password */}
-                        <div className="input-group">
-                            <label className="input-label">Password</label>
-                            <div className="input-wrapper">
-                                <Lock size={16} className="input-icon" />
-                                <input
-                                    id="password"
-                                    type={showPassword ? 'text' : 'password'}
-                                    className="login-input pr-10"
-                                    placeholder="••••••••"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    autoComplete="current-password"
-                                />
-                                <button
-                                    type="button"
-                                    className="eye-toggle"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                    tabIndex={-1}
-                                >
-                                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                                </button>
-                            </div>
-                        </div>
+                        {/* Admin-only: Email / Password fields */}
+                        {isAdmin && (
+                            <>
+                                <div className="input-group">
+                                    <label className="input-label">Administrator Email</label>
+                                    <div className="input-wrapper">
+                                        <Mail size={16} className="input-icon" />
+                                        <input
+                                            id="email"
+                                            type="text"
+                                            className="login-input"
+                                            placeholder="guruprasathveeramuthu@gmail.com"
+                                            value={emailOrUsername}
+                                            onChange={(e) => setEmailOrUsername(e.target.value)}
+                                            autoComplete="username"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="input-group">
+                                    <label className="input-label">Password</label>
+                                    <div className="input-wrapper">
+                                        <Lock size={16} className="input-icon" />
+                                        <input
+                                            id="password"
+                                            type={showPassword ? 'text' : 'password'}
+                                            className="login-input pr-10"
+                                            placeholder="••••••••"
+                                            value={password}
+                                            onChange={(e) => setPassword(e.target.value)}
+                                            autoComplete="current-password"
+                                        />
+                                        <button
+                                            type="button"
+                                            className="eye-toggle"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            tabIndex={-1}
+                                        >
+                                            {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                        </button>
+                                    </div>
+                                </div>
+                            </>
+                        )}
 
                         {/* Role Selection */}
                         <div className="input-group">

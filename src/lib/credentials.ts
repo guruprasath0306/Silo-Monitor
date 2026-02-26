@@ -1,9 +1,6 @@
-// Default credentials (fallback if user hasn't changed them)
+// Default credentials (admin only — other roles don't need credentials)
 export const DEFAULT_CREDENTIALS: Record<string, { email: string; password: string }> = {
-  admin:    { email: 'admin@farmsense.io',    password: 'admin123' },
-  manager:  { email: 'manager@farmsense.io',  password: 'manager123' },
-  operator: { email: 'operator@farmsense.io', password: 'operator123' },
-  viewer:   { email: 'viewer@farmsense.io',   password: 'viewer123' },
+  admin: { email: 'guruprasathveeramuthu@gmail.com', password: 'guru@03' },
 };
 
 const STORAGE_KEY = 'farmsense_credentials';
